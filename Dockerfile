@@ -1,9 +1,11 @@
 FROM ubuntu:22.04
 
-# تثبيت الأدوات الأساسية والـ SQL Server
-RUN apt-get update && apt-get install -y wget gnupg2 apt-transport-https curl
-RUN wget -qO- https://microsoft.com | gpg --dearmor > /usr/share/keyrings/microsoft.gpg
-RUN echo "deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/microsoft.gpg] https://microsoft.com jammy main" > /etc/apt/sources.list.d/mssql-server.list
+# تثبيت الأدوات الأساسية وتجاوز فحص المفاتيح المعقد لتفادي حظر الشبكة
+RUN apt-get update && apt-get install -y curl apt-transport-https gnupg2
+RUN curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl -fsSL https://packages.microsoft.com/config/ubuntu/22.04/mssql-server-2022.list | tee /etc/apt/sources.list.d/mssql-server-2022.list
+
+# التثبيت المباشر للـ SQL Server
 RUN apt-get update && apt-get install -y mssql-server
 
 ENV ACCEPT_EULA=Y
